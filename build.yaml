@@ -1,0 +1,8 @@
+version: 2
+
+build:
+  steps:
+  - pip install -r requirements.txt
+
+start:
+  command: gunicorn app:app

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de archivos</title>
+    <link rel="stylesheet" href="../static/styles.css">
+    <!-- <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #file-input {
+            display: none;
+        }
+        label {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button[type="submit"] {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        progress {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #28a745;
+            color: #fff;
+        }
+        .error {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        .download-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .download-button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style> -->
+</head>
+<body>
+    <div class="container">
+        <h1>CONVERSOR DE ARCHIVOS</h1>
+        <form id="file-form">
+            <label for="file-input">Seleccionar Archivos</label>
+            <input type="file" id="file-input" name="file" multiple>
+            <button type="submit">Subir Archivos</button>
+        </form>
+        <progress id="progress-bar" value="0" max="100"></progress>
+        <div id="success-message" class="message"></div>
+        <div id="error-message" class="message"></div>
+        <div class="download-buttons">
+            <button id="download-converted-btn" class="download-button">Descargar Archivos Convertidos</button>
+            <button id="download-errors-btn" class="download-button">Descargar Archivos de Errores</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('file-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            convertAndDownload();
+        });
+
+        document.getElementById('download-converted-btn').addEventListener('click', function() {
+            window.location.href = '/download_converted';
+        });
+
+        document.getElementById('download-errors-btn').addEventListener('click', function() {
+            window.location.href = '/download_errors';
+        });
+
+        function convertAndDownload() {
+            var formData = new FormData();
+            var files = document.getElementById('file-input').files;
+
+            for (var i = 0; i < files.length; i++) {
+                formData.append('file', files[i]);
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/convert');
+            xhr.upload.onprogress = function(event) {
+                if (event.lengthComputable) {
+                    var percentComplete = (event.loaded / event.total) * 100;
+                    document.getElementById('progress-bar').value = percentComplete;
+                }
+            };
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var jsonResponse = JSON.parse(xhr.responseText);
+                    document.getElementById('success-message').innerText = jsonResponse.message;
+                } else {
+                    document.getElementById('error-message').innerText = 'Hubo un error al procesar los archivos.';
+                }
+            };
+
+            xhr.send(formData);
+        }
+    </script>
+</body>
+</html>
